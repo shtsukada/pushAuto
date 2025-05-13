@@ -28,8 +28,20 @@ func main() {
 	}
 
 	run("git", "add", ".")
+
+	if isStagingAreaEmpty() {
+		fmt.Println("ステージされた変更がありません。コミットをスキップします。")
+		return
+	}
+
 	run("git", "commit", "-m", *message)
 	run("git", "push")
+}
+
+func isStagingAreaEmpty() bool {
+	cmd := exec.Command("git", "diff", "--cached", "--quiet")
+	err := cmd.Run()
+	return err == nil
 }
 
 func run(name string, arg ...string) {
