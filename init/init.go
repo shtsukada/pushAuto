@@ -43,11 +43,7 @@ func main() {
 
 func run(name string, args ...string) {
 	cmd := exec.Command(name, args...)
-
-	null, _ := os.Open(os.DevNull)
-	defer null.Close()
-
-	cmd.Stdout = null
+	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
 	err := cmd.Run()
 	if err != nil {

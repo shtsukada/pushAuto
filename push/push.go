@@ -48,11 +48,7 @@ func isStagingAreaEmpty() bool {
 
 func run(name string, arg ...string) {
 	cmd := exec.Command(name, arg...)
-
-	null, _ := os.Open(os.DevNull)
-	defer null.Close()
-
-	cmd.Stdout = null
+	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
 	err := cmd.Run()
 	if err != nil {
