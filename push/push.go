@@ -5,11 +5,13 @@ import (
 	"fmt"
 	"os"
 	"os/exec"
+
+	"github.com/fatih/color"
 )
 
 func main() {
 	if len(os.Args) < 2 || os.Args[1] != "push" {
-		fmt.Println("Usage: pushAuto push -m \"commit message\"")
+		color.Yellow("Usage: pushAuto push -m \"commit message\"")
 		os.Exit(1)
 	}
 
@@ -18,19 +20,19 @@ func main() {
 	pushCmd.Parse(os.Args[2:])
 
 	if *message == "" {
-		fmt.Println("コミットメッセージは -m フラグで指定してください。")
+		color.Yellow("コミットメッセージは -m フラグで指定してください。")
 		os.Exit(1)
 	}
 
 	if _, err := os.Stat(".git"); os.IsNotExist(err) {
-		fmt.Println("このディレクトリはGitリポジトリではありません。")
+		color.Yellow("このディレクトリはGitリポジトリではありません。")
 		os.Exit(1)
 	}
 
 	run("git", "add", ".")
 
 	if isStagingAreaEmpty() {
-		fmt.Println("ステージされた変更がありません。コミットをスキップします。")
+		color.Yellow("ステージされた変更がありません。コミットをスキップします。")
 		return
 	}
 
@@ -46,7 +48,11 @@ func isStagingAreaEmpty() bool {
 
 func run(name string, arg ...string) {
 	cmd := exec.Command(name, arg...)
-	cmd.Stdout = os.Stdout
+
+	null, _ := os.Open(os.DevNull)
+	defer null.Close()
+
+	cmd.Stdout = null
 	cmd.Stderr = os.Stderr
 	err := cmd.Run()
 	if err != nil {
