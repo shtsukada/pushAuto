@@ -10,17 +10,13 @@ import (
 	"net/http"
 	"os"
 	"os/exec"
+	"path/filepath"
 
 	"github.com/fatih/color"
 	"github.com/joho/godotenv"
 )
 
 func main() {
-	err := godotenv.Load(".env")
-	if err != nil {
-		log.Fatal(".envの読み込みに失敗しました。")
-	}
-
 	//サブコマンド判定
 	if len(os.Args) < 2 || os.Args[1] != "init" {
 		color.Yellow("Usage: pushAuto init -r <repo_url>")
@@ -75,7 +71,7 @@ type RepoResponse struct {
 }
 
 func createGitHubRepo(repoName string, private bool) (string, error) {
-	token := os.Getenv("GITHUB_TOKEN")
+	token := loadToken()
 	if token == "" {
 		return "", errors.New("環境変数 GITHUB_TOKENが設定されていません。")
 	}
@@ -89,7 +85,7 @@ func createGitHubRepo(repoName string, private bool) (string, error) {
 		return "", err
 	}
 
-	req, err := http.NewRequest("POST", "https://github.com/shtsukada/repos", bytes.NewBuffer(jsonBody))
+	req, err := http.NewRequest("POST", "https://api.github.com/user/repos", bytes.NewBuffer(jsonBody))
 	if err != nil {
 		return "", err
 	}
@@ -105,7 +101,7 @@ func createGitHubRepo(repoName string, private bool) (string, error) {
 	defer resp.Body.Close()
 
 	if resp.StatusCode >= 300 {
-		return "", fmt.Errorf("Github API Error:%s", resp.Status)
+		return "", fmt.Errorf("github API Error:%s", resp.Status)
 	}
 
 	var result RepoResponse
@@ -113,4 +109,26 @@ func createGitHubRepo(repoName string, private bool) (string, error) {
 		return "", err
 	}
 	return result.CloneURL, nil
+}
+
+func loadToken() string {
+	token := os.Getenv("GITHUB_TOKEN")
+	if token != "" {
+		return token
+	}
+
+	home, err := os.UserHomeDir()
+	if err == nil {
+		err = godotenv.Load(filepath.Join(home, ".env"))
+		if err == nil {
+			token = os.Getenv("GITHUB_TOKEN")
+			if token != "" {
+				return token
+			}
+		}
+	}
+
+	log.Fatal("GITHUB_TOKENが設定されていません。")
+	return ""
+
 }
