@@ -43,6 +43,9 @@ func main() {
 
 	//コマンド実行
 	run("git", "init")
+	run("git", "secrets", "--install")
+	run("git", "secrets", "--register-aws")
+	color.Green("git-secrets を自動導入しました")
 	run("git", "remote", "add", "origin", cloneURL)
 	run("git", "add", ".")
 	run("git", "commit", "-m", "init")
