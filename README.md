@@ -1,13 +1,13 @@
 # 目的
 Gitの下記コマンド自動化ツール
-git init
-git secrets --install
-git secrets --register-aws
-git remote
-git add
-git commit
-git branch
-git push
+- git init
+- git secrets --install
+- git secrets --register-aws
+- git remote
+- git add
+- git commit
+- git branch
+- git push
 
 ## 前提条件
 
@@ -19,3 +19,4 @@ git push
 macOSの場合は以下でインストール可能です：
 ```bash
 brew install git-secrets
+```

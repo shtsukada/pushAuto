@@ -17,13 +17,11 @@ import (
 )
 
 func main() {
-	//サブコマンド判定
 	if len(os.Args) < 2 || os.Args[1] != "init" {
 		color.Yellow("Usage: pushAuto init -r <repo_url>")
 		os.Exit(1)
 	}
 
-	//initコマンド用のフラグ定義
 	initCmd := flag.NewFlagSet("init", flag.ExitOnError)
 	repo := initCmd.String("r", "", "GitHub repository URL (e.g., https://github.com/user/repo.git)")
 	private := initCmd.Bool("private", false, "private")
@@ -41,7 +39,6 @@ func main() {
 	}
 	color.Green("Githubリポジトリ作成成功:%s", cloneURL)
 
-	//コマンド実行
 	run("git", "init")
 	run("git", "secrets", "--install")
 	run("git", "secrets", "--register-aws")
@@ -133,5 +130,4 @@ func loadToken() string {
 
 	log.Fatal("GITHUB_TOKENが設定されていません。")
 	return ""
-
 }
